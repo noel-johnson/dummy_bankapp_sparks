@@ -21,7 +21,7 @@ class _ViewAllPageState extends State<ViewAllPage> {
 
   @override
   void dispose() {
-    BankDatabase.instance.close();
+    // BankDatabase.instance.close();
     super.dispose();
   }
 
@@ -60,7 +60,9 @@ class _ViewAllPageState extends State<ViewAllPage> {
         padding: EdgeInsets.all(8),
         itemCount: customers.length,
         itemBuilder: (context, index) => ListTile(
-          title: Text(customers[index].name),
+          title: Text(
+            customers[index].name,
+          ),
         ),
       );
 }

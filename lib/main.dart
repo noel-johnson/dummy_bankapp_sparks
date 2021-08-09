@@ -1,3 +1,4 @@
+import 'package:bankapp/db/bank_database.dart';
 import 'package:bankapp/pages/home.dart';
 import 'package:bankapp/pages/transactions.dart';
 import 'package:bankapp/pages/view_all.dart';
@@ -20,8 +21,9 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
         // scaffoldBackgroundColor: Colors.grey.shade100,
-        bottomNavigationBarTheme: BottomNavigationBarThemeData()
-            .copyWith(selectedItemColor: Color(0xff4992ff)),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData().copyWith(
+            selectedItemColor: Color(0xff4992ff),
+            backgroundColor: Color(0xff222222)),
       ),
       theme: ThemeData.light().copyWith(
         appBarTheme: AppBarTheme().copyWith(
@@ -53,6 +55,13 @@ class _BasePageState extends State<BasePage> {
     ViewAllPage(),
     TransactionPage()
   ];
+
+  @override
+  void dispose() {
+    BankDatabase.instance.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

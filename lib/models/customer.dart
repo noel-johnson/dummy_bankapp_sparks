@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 
-final String tableCustomer = "customers";
+final String tableCustomer = "customer";
 
 class CustomerFields {
   static final List<String> values = [
@@ -10,7 +10,7 @@ class CustomerFields {
     currentBalance,
     dateCreated
   ];
-  static final String id = "_id";
+  static final String id = "id";
   static final String name = "name";
   static final String email = "email";
   static final String currentBalance = "current_balance";

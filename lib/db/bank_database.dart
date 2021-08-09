@@ -1,4 +1,8 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:bankapp/models/transfers.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:bankapp/models/customer.dart';
@@ -21,7 +25,22 @@ class BankDatabase {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    var exists = await databaseExists(path);
+    if (!exists) {
+      try {
+        await Directory(dirname(path)).create(recursive: true);
+      } catch (_) {
+        throw Exception("Database creation failed at directory check");
+      }
+      ByteData data = await rootBundle.load(join("assets", "sqlite.db"));
+      List<int> bytes =
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+
+      // Write and flush the bytes written
+      await File(path).writeAsBytes(bytes, flush: true);
+    }
+
+    return await openDatabase(path, version: 1);
   }
 
   Future _createDB(Database db, int version) async {
@@ -54,7 +73,7 @@ class BankDatabase {
 
   Future<List<Customer>> readAllCustomers() async {
     final db = await instance.database;
-    final orderBy = '${CustomerFields.dateCreated} DESC';
+    final orderBy = '${CustomerFields.dateCreated} ASC';
     final result = await db.query(tableCustomer, orderBy: orderBy);
     return result.map((json) => Customer.fromJson(json)).toList();
   }
