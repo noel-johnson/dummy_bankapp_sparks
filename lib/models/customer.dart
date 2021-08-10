@@ -1,5 +1,3 @@
-import 'package:sqflite/sqflite.dart';
-
 final String tableCustomer = "customer";
 
 class CustomerFields {

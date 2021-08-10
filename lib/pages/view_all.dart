@@ -1,5 +1,7 @@
 import 'package:bankapp/db/bank_database.dart';
 import 'package:bankapp/models/customer.dart';
+import 'package:bankapp/pages/payment.dart';
+import 'package:bankapp/pages/transactions.dart';
 import 'package:flutter/material.dart';
 
 class ViewAllPage extends StatefulWidget {
@@ -43,25 +45,62 @@ class _ViewAllPageState extends State<ViewAllPage> {
           "View All Customers",
         ),
       ),
-      body: Center(
-        child: isLoading
-            ? CircularProgressIndicator()
-            : customers.isEmpty
-                ? Text(
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : customers.isEmpty
+              ? Center(
+                  child: Text(
                     "No Data 👀",
                     style: TextStyle(fontSize: 20),
-                  )
-                : buildCustomers(),
-      ),
+                  ),
+                )
+              : buildCustomers(),
     );
   }
 
-  Widget buildCustomers() => ListView.builder(
-        padding: EdgeInsets.all(8),
-        itemCount: customers.length,
-        itemBuilder: (context, index) => ListTile(
-          title: Text(
-            customers[index].name,
+  Widget buildCustomers() => SizedBox(
+        width: double.infinity,
+        child: InteractiveViewer(
+          constrained: false,
+          child: DataTable(
+            showCheckboxColumn: false,
+            columns: [
+              DataColumn(label: Text("id")),
+              DataColumn(label: Text("Name")),
+              DataColumn(label: Text("Email")),
+              DataColumn(label: Text("Current Balance")),
+            ],
+            rows: List<DataRow>.generate(
+              customers.length,
+              (index) => DataRow(
+                  color: MaterialStateProperty.resolveWith<Color?>(
+                      (Set<MaterialState> states) {
+                    // // All rows will have the same selected color.
+                    // if (states.contains(MaterialState.selected)) {
+                    //   return Theme.of(context).colorScheme.primary.withOpacity(0.08);
+                    // }
+                    // Even rows will have a grey color.
+                    if (index.isEven) {
+                      return Colors.grey.withOpacity(0.3);
+                    }
+                    return null; // Use default value for other states and odd rows.
+                  }),
+                  cells: [
+                    DataCell(Text('${customers[index].id}')),
+                    DataCell(Text('${customers[index].name}')),
+                    DataCell(Text('${customers[index].email}')),
+                    DataCell(Text('${customers[index].currentBalance}')),
+                  ],
+                  onSelectChanged: (v) async {
+                    await Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          PaymentPage(customer: customers[index]),
+                    ));
+                    refreshCustomers();
+                  }),
+            ),
           ),
         ),
       );

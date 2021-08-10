@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'BankApp',
       darkTheme: ThemeData.dark().copyWith(
+        primaryColor: Color(0xff4992ff),
         appBarTheme: AppBarTheme().copyWith(
           centerTitle: true,
           // backgroundColor: Colors.grey.shade100,
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
             backgroundColor: Color(0xff222222)),
       ),
       theme: ThemeData.light().copyWith(
+        primaryColor: Color(0xff0d6efd),
         appBarTheme: AppBarTheme().copyWith(
             centerTitle: true,
             elevation: 0,

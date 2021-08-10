@@ -40,23 +40,23 @@ class BankDatabase {
       await File(path).writeAsBytes(bytes, flush: true);
     }
 
-    return await openDatabase(path, version: 1);
+    return await openDatabase(path, version: 2, onCreate: _createDB);
   }
 
   Future _createDB(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE $tableCustomer(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, current_balance REAL, date_created INTEGER)
-      ''');
+    // await db.execute('''
+    //   CREATE TABLE $tableCustomer(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, current_balance REAL, date_created INTEGER)
+    //   ''');
     await db.execute(
-      'CREATE TABLE $tableTransfer(id INTEGER PRIMARY KEY AUTOINCREMENT, sender_name TEXT, receiver_name TEXT, amount REAL, transfer_date INTEGER)',
+      'CREATE TABLE $tableTransfer(id INTEGER PRIMARY KEY AUTOINCREMENT, sender_name TEXT, receiver_name TEXT, amount REAL, transfer_date TEXT)',
     );
   }
 
-  Future<Customer> create(Customer customer) async {
-    final db = await instance.database;
-    final id = await db.insert(tableCustomer, customer.toMap());
-    return customer.copy(id: id);
-  }
+  // Future<Customer> create(Customer customer) async {
+  //   final db = await instance.database;
+  //   final id = await db.insert(tableCustomer, customer.toMap());
+  //   return customer.copy(id: id);
+  // }
 
   Future<Customer> readCustomer(int id) async {
     final db = await instance.database;
@@ -71,9 +71,15 @@ class BankDatabase {
       throw Exception('ID $id not found');
   }
 
-  Future<List<Customer>> readAllCustomers() async {
+  Future<List<Customer>> readAllCustomers({int? id}) async {
     final db = await instance.database;
-    final orderBy = '${CustomerFields.dateCreated} ASC';
+    final orderBy = '${CustomerFields.id} ASC';
+    if (id != null) {
+      final result = await db.query(tableCustomer,
+          orderBy: orderBy, where: '${CustomerFields.id}<>?', whereArgs: [id]);
+      return result.map((json) => Customer.fromJson(json)).toList();
+    }
+
     final result = await db.query(tableCustomer, orderBy: orderBy);
     return result.map((json) => Customer.fromJson(json)).toList();
   }
@@ -82,6 +88,20 @@ class BankDatabase {
     final db = await instance.database;
     return db.update(tableCustomer, customer.toMap(),
         where: '${CustomerFields.id}=?', whereArgs: [customer.id]);
+  }
+
+  // Transfer table
+  Future<List<Transfers>> readAllTransfers() async {
+    final db = await instance.database;
+    final orderBy = '${TransferFields.transferDate} DESC';
+    final result = await db.query(tableTransfer, orderBy: orderBy);
+    return result.map((json) => Transfers.fromJson(json)).toList();
+  }
+
+  Future<Transfers> create(Transfers transfer) async {
+    final db = await instance.database;
+    final id = await db.insert(tableTransfer, transfer.toMap());
+    return transfer.copy(id: id);
   }
 
   Future close() async {
