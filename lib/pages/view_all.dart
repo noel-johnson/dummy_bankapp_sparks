@@ -1,7 +1,6 @@
 import 'package:bankapp/db/bank_database.dart';
 import 'package:bankapp/models/customer.dart';
 import 'package:bankapp/pages/payment.dart';
-import 'package:bankapp/pages/transactions.dart';
 import 'package:flutter/material.dart';
 
 class ViewAllPage extends StatefulWidget {
@@ -77,11 +76,6 @@ class _ViewAllPageState extends State<ViewAllPage> {
               (index) => DataRow(
                   color: MaterialStateProperty.resolveWith<Color?>(
                       (Set<MaterialState> states) {
-                    // // All rows will have the same selected color.
-                    // if (states.contains(MaterialState.selected)) {
-                    //   return Theme.of(context).colorScheme.primary.withOpacity(0.08);
-                    // }
-                    // Even rows will have a grey color.
                     if (index.isEven) {
                       return Colors.grey.withOpacity(0.3);
                     }
